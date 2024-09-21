@@ -22,6 +22,16 @@ class SlideController extends Controller
         // Return the slide data as JSON
         return response()->json($slide);
     }
+    public function store(Request $request){
+        $fields = $request->validate([
+            'slide_id' => 'required',
+            'content' => 'required',
+            'metadata' => 'required'
+        ]);
+        // $slide = Slide::create($fields);
+        return [ 'slides' => $fields ];
+    }
+
     public function index()
     {
         // 'user_id' => auth()->id(),
