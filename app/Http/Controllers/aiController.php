@@ -103,45 +103,54 @@ class aiController extends Controller
     public function updateChat(Request $request)
 {
     // Validate the input
-    $request->validate([
-        'chat_id' => 'required|integer|exists:chats,id', // Validate chat_id is required, an integer, and exists in the chats table
-        'query' => 'required|string',
-    ]);
+$request->validate([
+    'chat_id' => 'required|integer|exists:chats,id', // Validate chat_id is required, an integer, and exists in the chats table
+    'query' => 'required|string',
+]);
 
-    // Retrieve the chat ID from the request
-    $chatId = $request->input('chat_id');
-    $chat = Chat::findOrFail($chatId);
+// Retrieve the chat ID from the request
+$chatId = $request->input('chat_id');
+$chat = Chat::findOrFail($chatId);
 
-    // Ensure the authenticated user owns the chat
-    if ($chat->user_id != auth()->id()) {
-        return response()->json(['error' => 'Unauthorized'], 403);
-    }
+// Ensure the authenticated user owns the chat
+if ($chat->user_id != auth()->id()) {
+    return response()->json(['error' => 'Unauthorized'], 403);
+}
 
-    // Generate and save the chat title if it's currently null
-    if (empty($chat->chat_title)) {
-        $chat->chat_title = $this->generateChatTitle($request->input('query'));
-        $chat->save(); // Save the updated chat with the new title
-    }
+// Generate and save the chat title if it's currently null
+if (empty($chat->chat_title)) {
+    $chat->chat_title = $this->generateChatTitle($request->input('query'));
+    $chat->save(); // Save the updated chat with the new title
+}
 
-    // Extract text from slides
-    $slidePath = storage_path('app/slides');
-    $allText = $this->extractSlidesText($slidePath);
+// Get the user's ID to locate their specific folder
+$userId = auth()->id();
+$slidePath = storage_path("app/private/slides/user_{$userId}");
 
-    // Get the AI-generated response
-    $query = $request->input('query');
-    $response = $this->getNlpResponse($query, $allText);
+// Ensure the directory exists before attempting to extract text
+if (!file_exists($slidePath)) {
+    return response()->json(['error' => 'No slides found for the user', 'slide_path' => $slidePath ], 404);
+}
 
-    // Create a new conversation in the chat
-    $conversation = Conversation::create([
-        'chat_id' => $chat->id,
-        'query' => $query,
-        'response' => $response,
-    ]);
+// Extract text from the user's slides
+$allText = $this->extractSlidesText($slidePath);
 
-    return response()->json([
-        'chat_id' => $chat->id,
-        'conversation' => $conversation,
-    ]);
+// Get the AI-generated response
+$query = $request->input('query');
+$response = $this->getNlpResponse($query, $allText);
+
+// Create a new conversation in the chat
+$conversation = Conversation::create([
+    'chat_id' => $chat->id,
+    'query' => $query,
+    'response' => $response,
+]);
+
+return response()->json([
+    'chat_id' => $chat->id,
+    'conversation' => $conversation,
+]);
+
 }
 
 /**

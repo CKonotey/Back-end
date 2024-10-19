@@ -33,14 +33,16 @@ Route::middleware('auth:api')->group(function () {
 
     // logging out of the system
     Route::post('logout', [Login::class, 'logout']);
+
+    // uploading of slides and creating a folder for the user
+    Route::post('ai/upload-slide', [SlideController::class, 'uploadSlide']);
 });
 
 
 Route::post('forgot-password', [PasswordResetController::class, 'forgotPassword']);
 Route::post('reset-password', [PasswordResetController::class, 'resetPassword']);
-Route::post('/query-slide', [SlidesController::class, 'querySlide']);
-Route::get('/query-slide/show', [SlidesController::class, 'index']);
-Route::post('/upload-slide', [SlidesController::class, 'uploadSlide']);
+
+
 
 
 
