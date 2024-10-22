@@ -271,6 +271,10 @@ private function generateChatTitle($query)
         $client = new Client();
 
         try {
+
+            // Modify the prompt to instruct the model to explain bullet points
+            $prompt = "Context: $context\n\nSome points are bulleted without much explanation. Expand on the following point: \"$query\" with detailed information.\n\nAnswer:";
+
             $response = $client->post($this->cohereApiUrl, [
                 'headers' => [
                     'Authorization' => 'Bearer ' . $this->cohereApiKey,
@@ -278,7 +282,7 @@ private function generateChatTitle($query)
                 ],
                 'json' => [
                     'model' => 'command-xlarge-nightly',
-                    'prompt' => "Context: $context\n\nQuestion: $query\n\nAnswer:",
+                    'prompt' => $prompt,
                     'max_tokens' => 150,
                     'temperature' => 0.7,
                     'k' => 1,
