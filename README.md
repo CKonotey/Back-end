@@ -24,8 +24,63 @@ Laravel is accessible, powerful, and provides tools required for large, robust a
 
 ## How to setup the project 
 
-This is where the setup of the project on your personal pc will be. 
-Will update it once complete
+# Installation Guide
+
+Follow these steps to set up and run the project locally.
+
+### Prerequisites
+
+Make sure you have the following installed:
+
+- Git
+- Composer
+- Node.js and npm
+- PHP >= 8.1
+- MySQL 
+
+### Installation Steps
+
+1. **Clone the GitHub repository**
+   ```sh
+   git clone https://github.com/efthakhar/invextry.git
+   
+2. **Install Composer packages:**
+   ```sh
+   composer install
+   
+3. **Create .env file**
+
+   Duplicate .env.example and rename it to .env.
+   
+4. **Generate encryption key**
+
+    Run the following command to generate a unique application key.
+    
+      ```sh
+    php artisan key:generate
+
+5. **Update APP_URL in .env**
+
+    Open .env file and update the APP_URL value according to your application's domain path. For local development, it will typically be:
+    
+      ```sh
+    APP_URL=http://127.0.0.1:9000
+
+6. **Run migrations**
+
+      ```sh
+    php artisan migrate
+
+7. **Start the development server**
+
+      ```sh
+    php artisan serve
+
+
+
+Now you're all set up! Your API is live, open up POSTMAN and run some queries on the API Route.
+   
+
 
 
 ## Learning Laravel
