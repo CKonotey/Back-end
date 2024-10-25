@@ -10,6 +10,7 @@ use GuzzleHttp\Client;
 use Illuminate\Support\Facades\File;
 use Smalot\PdfParser\Parser as PdfParser;
 use PhpOffice\PhpPresentation\IOFactory as PptParser;
+use App\Helpers\CohereHelper;
 
 class GroupController extends Controller
 {
@@ -76,8 +77,8 @@ public function groupChat(Request $request, $groupId)
         $slidePath = storage_path("app/groups/{$groupId}");
         $allText = $this->extractSlidesText($slidePath);
 
-        // Get AI response
-        $response = $this->getNlpResponse($query, $allText);
+         // Use the CohereHelper to get the NLP response
+         $response = CohereHelper::getNlpResponse($query, $allText);
 
         // Save conversation to group
         // $conversation = $group->conversations()->create([
@@ -143,37 +144,37 @@ public function groupChat(Request $request, $groupId)
        /**
      * Get the AI response from Cohere API
      */
-    private function getNlpResponse($query, $context)
-    {
-        $client = new Client();
+    // private function getNlpResponse($query, $context)
+    // {
+    //     $client = new Client();
 
-        try {
+    //     try {
 
-            // Modify the prompt to instruct the model to explain bullet points
-            $prompt = "Context: $context\n\nSome points are bulleted without much explanation. Expand on the following point: \"$query\" with detailed information.\n\nAnswer:";
+    //         // Modify the prompt to instruct the model to explain bullet points
+    //         $prompt = "Context: $context\n\nSome points are bulleted without much explanation. Expand on the following point: \"$query\" with detailed information.\n\nAnswer:";
 
-            $response = $client->post($this->cohereApiUrl, [
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $this->cohereApiKey,
-                    'Content-Type' => 'application/json',
-                ],
-                'json' => [
-                    'model' => 'command-xlarge-nightly',
-                    'prompt' => $prompt,
-                    'max_tokens' => 150,
-                    'temperature' => 0.7,
-                    'k' => 1,
-                    'stop_sequences' => ['\n'],
-                ],
-            ]);
+    //         $response = $client->post($this->cohereApiUrl, [
+    //             'headers' => [
+    //                 'Authorization' => 'Bearer ' . $this->cohereApiKey,
+    //                 'Content-Type' => 'application/json',
+    //             ],
+    //             'json' => [
+    //                 'model' => 'command-xlarge-nightly',
+    //                 'prompt' => $prompt,
+    //                 'max_tokens' => 150,
+    //                 'temperature' => 0.7,
+    //                 'k' => 1,
+    //                 'stop_sequences' => ['\n'],
+    //             ],
+    //         ]);
 
-            $body = json_decode($response->getBody(), true);
+    //         $body = json_decode($response->getBody(), true);
 
-            return $body['generations'][0]['text'] ?? 'No relevant information found.';
-        } catch (\Exception $e) {
-            return 'Error fetching response: ' . $e->getMessage();
-        }
-    }
+    //         return $body['generations'][0]['text'] ?? 'No relevant information found.';
+    //     } catch (\Exception $e) {
+    //         return 'Error fetching response: ' . $e->getMessage();
+    //     }
+    // }
 
 
 
