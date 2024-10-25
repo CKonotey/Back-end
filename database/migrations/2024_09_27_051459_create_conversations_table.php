@@ -11,6 +11,7 @@ class CreateConversationsTable extends Migration
         Schema::create('conversations', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('chat_id');
+            $table->unsignedBigInteger('group_id');
             $table->text('query');
             $table->text('response')->nullable();
             $table->timestamps();

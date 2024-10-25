@@ -140,11 +140,18 @@ $query = $request->input('query');
 $response = $this->getNlpResponse($query, $allText);
 
 // Create a new conversation in the chat
+// $conversation = Conversation::create([
+//     'chat_id' => $chat->id,
+//     'query' => $query,
+//     'response' => $response,
+// ]);
+
 $conversation = Conversation::create([
-    'chat_id' => $chat->id,
+    'chat_id' => $chatId,
     'query' => $query,
     'response' => $response,
 ]);
+
 
 return response()->json([
     'chat_id' => $chat->id,

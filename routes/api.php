@@ -6,7 +6,7 @@ use App\Http\Controllers\Login;
 use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\Register;
 use App\Http\Controllers\SlideController;
-use App\Http\Controllers\SlidesController;
+use App\Http\Controllers\GroupController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -36,6 +36,11 @@ Route::middleware('auth:api')->group(function () {
 
     // uploading of slides and creating a folder for the user
     Route::post('ai/upload-slide', [SlideController::class, 'uploadSlide']);
+
+    Route::post('/create/groups', [GroupController::class, 'createGroup']);
+    Route::post('/groups/join/{group}', [GroupController::class, 'joinGroup']);
+    Route::post('/groups/slides/{group}', [GroupController::class, 'uploadSlides']);
+    Route::post('/groups/chat/{group}', [GroupController::class, 'groupChat']);
 });
 
 
