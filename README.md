@@ -22,8 +22,6 @@ Laravel is a web application framework with expressive, elegant syntax. We belie
 Laravel is accessible, powerful, and provides tools required for large, robust applications.
 
 
-## How to setup the project 
-
 # Installation Guide
 
 Follow these steps to set up and run the project locally.
@@ -75,8 +73,6 @@ Make sure you have the following installed:
 
       ```sh
     php artisan serve
-
-
 
 Now you're all set up! Your API is live, open up POSTMAN and run some queries on the API Route.
    
