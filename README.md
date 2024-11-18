@@ -40,7 +40,7 @@ Make sure you have the following installed:
 
 1. **Clone the GitHub repository**
    ```sh
-   git clone https://github.com/efthakhar/invextry.git
+   git clone https://github.com/CKonotey/Back-end
    
 2. **Install Composer packages:**
    ```sh
@@ -57,25 +57,48 @@ Make sure you have the following installed:
       ```sh
     php artisan key:generate
 
-5. **Update APP_URL in .env**
+5. **Create API keys for Cohere, Gemini & Pusher**
+
+    Go to the following websites to create and generate API Keys in .env
+    
+    Cohere 
+      ```sh
+    https://dashboard.cohere.com/
+
+    Gemini 
+      ```sh
+    https://ai.google.dev/aistudio
+
+
+    Pusher 
+      ```sh
+    https://dashboard.pusher.com
+
+
+6. **Update APP_URL in .env**
 
     Open .env file and update the APP_URL value according to your application's domain path. For local development, it will typically be:
     
       ```sh
     APP_URL=http://127.0.0.1:9000
 
-6. **Run migrations**
+7. **Run migrations**
 
       ```sh
     php artisan migrate
 
-7. **Start the development server**
+8. **Start the development server**
 
       ```sh
     php artisan serve
 
 Now you're all set up! Your API is live, open up POSTMAN and run some queries on the API Route.
    
+## API Documentation
+This template guides you through CRUD operations (GET, POST, PUT, DELETE), variables, and tests.
+
+Can be shared upon request - be sure to leave a comment and I will get back to you. 
+  
 
 
 
