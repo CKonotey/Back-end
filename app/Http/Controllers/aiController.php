@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\File;
 use Smalot\PdfParser\Parser as PdfParser;
 use PhpOffice\PhpPresentation\IOFactory as PptParser;
 use App\Helpers\CohereHelper;
+use App\Helpers\GeminiHelper;
 
 class aiController extends Controller
 {
@@ -21,7 +22,8 @@ class aiController extends Controller
 
     public function __construct()
     {
-        $this->cohereApiKey = env('COHERE_API_KEY');
+        $this->cohereApiKey = config('services.cohere.api_key');
+
     }
 
     /**
@@ -103,7 +105,7 @@ class aiController extends Controller
      */
     public function updateChat(Request $request)
 {
-    // Validate the input
+ // Validate incoming request data
 $request->validate([
     'chat_id' => 'required|integer|exists:chats,id', // Validate chat_id is required, an integer, and exists in the chats table
     'query' => 'required|string',
@@ -128,9 +130,12 @@ if (empty($chat->chat_title)) {
 $userId = auth()->id();
 $slidePath = storage_path("app/private/slides/user_{$userId}");
 
-// Ensure the directory exists before attempting to extract text
-if (!file_exists($slidePath)) {
-    return response()->json(['error' => 'No slides found for the user', 'slide_path' => $slidePath ], 404);
+// Check if the directory exists and contains slides
+if (!file_exists($slidePath) || count(scandir($slidePath)) <= 2) { // `<= 2` because `scandir` returns `.` and `..` even if empty
+    return response()->json([
+        'message' => 'Please upload slides to start the conversation with the AI.',
+        'slide_path' => $slidePath
+    ], 200);
 }
 
 // Extract text from the user's slides
@@ -138,21 +143,23 @@ $allText = $this->extractSlidesText($slidePath);
 
 // Get the AI-generated response
 $query = $request->input('query');
- // Use the CohereHelper to get the NLP response
- $response = CohereHelper::getNlpResponse($query, $allText);
+// Use the CohereHelper to get the NLP response
+$response = CohereHelper::getNlpResponse($query, $allText);
+// $response = GeminiHelper::getNlpResponse($query, $allText);
 
 // Create a new conversation in the chat
-// $conversation = Conversation::create([
-//     'chat_id' => $chat->id,
-//     'query' => $query,
-//     'response' => $response,
-// ]);
-
 $conversation = Conversation::create([
     'chat_id' => $chatId,
     'query' => $query,
     'response' => $response,
 ]);
+
+// Return the response to the user
+// return response()->json([
+//     'message' => 'Conversation created successfully.',
+//     'conversation' => $conversation,
+//     'ai_response' => $response
+// ], 201);
 
 
 return response()->json([
@@ -271,39 +278,4 @@ private function generateChatTitle($query)
 
         return $allText;
     }
-
-    /**
-     * Get the AI response from Cohere API
-     */
-    // private function getNlpResponse($query, $context)
-    // {
-    //     $client = new Client();
-
-    //     try {
-
-    //         // Modify the prompt to instruct the model to explain bullet points
-    //         $prompt = "Context: $context\n\nSome points are bulleted without much explanation. Expand on the following point: \"$query\" with detailed information.\n\nAnswer:";
-
-    //         $response = $client->post($this->cohereApiUrl, [
-    //             'headers' => [
-    //                 'Authorization' => 'Bearer ' . $this->cohereApiKey,
-    //                 'Content-Type' => 'application/json',
-    //             ],
-    //             'json' => [
-    //                 'model' => 'command-xlarge-nightly',
-    //                 'prompt' => $prompt,
-    //                 'max_tokens' => 150,
-    //                 'temperature' => 0.7,
-    //                 'k' => 1,
-    //                 'stop_sequences' => ['\n'],
-    //             ],
-    //         ]);
-
-    //         $body = json_decode($response->getBody(), true);
-
-    //         return $body['generations'][0]['text'] ?? 'No relevant information found.';
-    //     } catch (\Exception $e) {
-    //         return 'Error fetching response: ' . $e->getMessage();
-    //     }
-    // }
 }

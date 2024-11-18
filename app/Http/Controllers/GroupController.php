@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\File;
 use Smalot\PdfParser\Parser as PdfParser;
 use PhpOffice\PhpPresentation\IOFactory as PptParser;
 use App\Helpers\CohereHelper;
+use App\Helpers\BroadcastHelper;
+use Illuminate\Support\Facades\Broadcast;
+use Illuminate\Support\Facades\Log;
 
 class GroupController extends Controller
 {
@@ -23,6 +26,30 @@ class GroupController extends Controller
     public function __construct()
     {
         $this->cohereApiKey = env('COHERE_API_KEY');
+    }
+
+     /**
+     * Get conversations for a specific group.
+     *
+     * @param int $groupId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getGroupConversations($groupId)
+    {
+        $group = Group::findOrFail($groupId); // Ensure the group exists
+
+        $conversations = Conversation::where('group_id', $groupId)
+            ->with('chat') // Eager load the related chat if needed
+            ->get();
+
+        return response()->json($conversations);
+    }
+    // getting all groups
+    public function getAllGroups()
+    {
+        $groups = Group::all(); // Retrieve all groups from the database
+
+        return response()->json($groups);
     }
 
     // creating a group
@@ -80,27 +107,32 @@ public function groupChat(Request $request, $groupId)
          // Use the CohereHelper to get the NLP response
          $response = CohereHelper::getNlpResponse($query, $allText);
 
-        // Save conversation to group
-        // $conversation = $group->conversations()->create([
-        //     'user_id' => $user->id,
-        //     'message' => $message,
-        //     'response' => $response,
-        // ]);
-
-        $conversation = Conversation::create([
-            'group_id' => $groupId,  // Use the group ID
+         $conversation = Conversation::create([
+            'group_id' => $groupId,
             'query' => $query,
             'response' => $response,
+            'user_id' => $user->id,
+            'user_name' => $user->name,
         ]);
+         // Broadcast the new conversation message to the group channel
 
+         $broadcaster = new BroadcastHelper();
+         $broadcaster->sendMessageToGroupChat($groupId, $conversation->toArray());
+
+    // Dispatch the event
+        // event(new NewMessage($conversation));
         return response()->json(['conversation' => $conversation]);
     }
 
     // Save non-AI message to group chat
     $conversation = $group->conversations()->create([
         'user_id' => $user->id,
+        'user_name' => $user->name,
         'query' => $query,
     ]);
+
+    $broadcaster = new BroadcastHelper();
+    $broadcaster->sendMessageToGroupChat($groupId, $conversation->toArray());
 
     return response()->json(['conversation' => $conversation]);
 }
@@ -140,42 +172,4 @@ public function groupChat(Request $request, $groupId)
 
         return $allText;
     }
-
-       /**
-     * Get the AI response from Cohere API
-     */
-    // private function getNlpResponse($query, $context)
-    // {
-    //     $client = new Client();
-
-    //     try {
-
-    //         // Modify the prompt to instruct the model to explain bullet points
-    //         $prompt = "Context: $context\n\nSome points are bulleted without much explanation. Expand on the following point: \"$query\" with detailed information.\n\nAnswer:";
-
-    //         $response = $client->post($this->cohereApiUrl, [
-    //             'headers' => [
-    //                 'Authorization' => 'Bearer ' . $this->cohereApiKey,
-    //                 'Content-Type' => 'application/json',
-    //             ],
-    //             'json' => [
-    //                 'model' => 'command-xlarge-nightly',
-    //                 'prompt' => $prompt,
-    //                 'max_tokens' => 150,
-    //                 'temperature' => 0.7,
-    //                 'k' => 1,
-    //                 'stop_sequences' => ['\n'],
-    //             ],
-    //         ]);
-
-    //         $body = json_decode($response->getBody(), true);
-
-    //         return $body['generations'][0]['text'] ?? 'No relevant information found.';
-    //     } catch (\Exception $e) {
-    //         return 'Error fetching response: ' . $e->getMessage();
-    //     }
-    // }
-
-
-
 }

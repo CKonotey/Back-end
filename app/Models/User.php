@@ -47,5 +47,9 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->belongsToMany(Group::class, 'group_user');
     }
+    public function conversations()
+    {
+        return $this->hasMany(Conversation::class);
+    }
 
 }

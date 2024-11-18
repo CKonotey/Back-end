@@ -41,6 +41,8 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/groups/join/{group}', [GroupController::class, 'joinGroup']);
     Route::post('/groups/slides/{group}', [GroupController::class, 'uploadSlides']);
     Route::post('/groups/chat/{group}', [GroupController::class, 'groupChat']);
+    Route::get('/getgroups', [GroupController::class, 'getAllGroups']);
+    Route::get('/groups/conversations/{groupId}', [GroupController::class, 'getGroupConversations']);
 });
 
 

@@ -13,12 +13,14 @@ class CohereHelper
      * @param string $context
      * @return string
      */
+    protected $cohereApiUrl = 'https://api.cohere.ai/v1/generate';
+
     public static function getNlpResponse($query, $context)
     {
         $client = new Client();
 
         try {
-            $cohereApiKey = env('COHERE_API_KEY');  // Retrieve the API key
+            $cohereApiKey = config('services.cohere.api_key');  // Retrieve the API key
             $cohereApiUrl = 'https://api.cohere.ai/v1/generate';  // Set the API URL
 
             // Modify the prompt for bulleted content
