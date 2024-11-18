@@ -60,20 +60,10 @@ Make sure you have the following installed:
 5. **Create API keys for Cohere, Gemini & Pusher**
 
     Go to the following websites to create and generate API Keys in .env
-    
-    Cohere 
-      ```sh
-    https://dashboard.cohere.com/
 
-    Gemini 
-      ```sh
-    https://ai.google.dev/aistudio
-
-
-    Pusher 
-      ```sh
-    https://dashboard.pusher.com
-
+    - **[Cohere](https://dashboard.cohere.com//)**
+    - **[Gemini](https://ai.google.dev/aistudio/)**
+    - **[Pusher](https://dashboard.pusher.com/)**
 
 6. **Update APP_URL in .env**
 
