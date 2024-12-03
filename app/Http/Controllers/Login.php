@@ -18,13 +18,20 @@ class Login extends Controller
             'email' => 'required|email',
             'password' => 'required|string|min:6',
         ]);
-        $user = User::where('email', $request->email)->first();
+        $user = User::with('profile')->where('email', $request->email)->first();
+        // $user = User::where('email', $request->email)->first();
         // Attempt to authenticate and issue a token
         if (!$token = JWTAuth::attempt($credentials)) {
             return response()->json(['error' => 'Invalid login credentials'], 401);
         }
 
-        return $this->respondWithToken($token, $user);
+        // return $this->respondWithToken($token, $user);
+
+        return response()->json([
+            'token' => $token,
+            'user' => $user,
+            // 'profile' => $user->profile,
+        ]);
     }
 
     // Logout user and invalidate token

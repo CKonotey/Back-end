@@ -9,6 +9,7 @@ use App\Http\Controllers\SlideController;
 use App\Http\Controllers\GroupController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\profiles;
 
 // Register a user
 Route::post('register', [Register::class, 'register']);
@@ -43,6 +44,11 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/groups/chat/{group}', [GroupController::class, 'groupChat']);
     Route::get('/getgroups', [GroupController::class, 'getAllGroups']);
     Route::get('/groups/conversations/{groupId}', [GroupController::class, 'getGroupConversations']);
+
+    // handling profile addition, deletion and updating
+    Route::post('/profile', [profiles::class, 'store']);
+    Route::patch('/profile/update-field', [profiles::class, 'updateField']);
+    Route::delete('/profile/delete-field', [profiles::class, 'deleteField']);
 });
 
 

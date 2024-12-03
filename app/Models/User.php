@@ -52,4 +52,23 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasMany(Conversation::class);
     }
 
+     /**
+     * Get the profile associated with the user.
+     */
+    public function profile()
+    {
+        return $this->hasOne(Profile::class);
+    }
+  /**
+     * Automatically create an empty profile when a user is created.
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::created(function ($user) {
+            $user->profile()->create();
+        });
+    }
+
 }
